@@ -13,13 +13,13 @@ WebScrapper a pretty easy to set up on your device.
         
 
 # PYTHON
-    1. Clone this repository into your device.
-    2. Open project terminal and type: python -m pip install -r requirements.txt
-    3. Create a db_config.py file in project folder and type some important variables in:
-        host = '127.0.0.1' # or another IP if you using host
-        user = 'root'
-        password = 'password' # you can type any password you want, but you should remember it
-        db_name = 'houses_db'
+Clone this repository into your device.
+Open project terminal and type: python -m pip install -r requirements.txt
+Create a db_config.py file in project folder and type some important variables in:
+                host = '127.0.0.1' # or another IP if you using host
+                user = 'root'
+                password = 'password' # you can type any password you want, but you should remember it
+                db_name = 'houses_db'
 
 Perfect! Now you can run scrapper.py, wait some time and look out the results in MySQL Workbench
         
