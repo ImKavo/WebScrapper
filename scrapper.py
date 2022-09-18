@@ -3,36 +3,43 @@ from requests import get
 import time
 import random
 from db_config import host, user, password, db_name
-import mysql.connector
+from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData
+from dataclasses import dataclass
+
+meta = MetaData()
+ads_table = Table('Ads_table', meta,
+                  Column('id', Integer, autoincrement=True, nullable=False, unique=True, primary_key=True),
+                  Column('image', String(256)),
+                  Column('title', String(516)),
+                  Column('date_posted', String(32)),
+                  Column('location', String(32)),
+                  Column('beds', String(16)),
+                  Column('description', String(1024)),
+                  Column('currency', String(4)),
+                  Column('price', String(32))
+                  )
+
+engine = create_engine(f'mysql+mysqlconnector://{user}:{password}@{host}/{db_name}', echo=True)
+meta.create_all(engine)
+conn = engine.connect()
 
 
+@dataclass
 class Flat:
-    def __init__(self, image, title, date_posted, location, beds, description, price):
-        self.image = image
-        self.title = title
-        self.date_posted = date_posted
-        self.location = location
-        self.beds = beds
-        self.description = description
-        self.price = price
+    """
+    Stores ads parameters
+    """
+    image: str
+    title: str
+    date_posted: str
+    location: str
+    beds: str
+    description: str
+    currency: str
+    price: str
 
     def __str__(self):
         return self.title
-
-
-try:
-    mydb = mysql.connector.connect(
-        host=host,
-        user=user,
-        passwd=password,
-        database=db_name
-    )
-    print('MySQL: Successfully connected!')
-    print('#' * 20)
-    mycursor = mydb.cursor()
-except Exception as ex:
-    print('MySQL: Connection refused...')
-    print(ex)
 
 
 def create_flats(images: list, titles: list, dates_posted: list, locations: list, beds: list, descriptions: list,
@@ -41,8 +48,19 @@ def create_flats(images: list, titles: list, dates_posted: list, locations: list
     Creates a list of flats
     """
     flats_list = []
+    currency_list = ['$', '€', '£', '¥', '₣', '₹', 'د.ك', 'د.إ', '﷼',
+                     '₻', '₽', '₾', '₺', '₼', '₸', '₴', '₷', '원', '₫',
+                     '₮', '₯', '₱', '₳', '₵', '₲', '₪', '₰']
     for i in range(len(titles)):
-        flat = Flat(images[i], titles[i], dates_posted[i], locations[i], beds[i], descriptions[i], prices[i])
+        if prices[i][0] not in currency_list:
+            price = prices[i]
+            currency = 'None'
+        else:
+            price = prices[i][1:]
+            currency = prices[i][0]
+        flat = Flat(images[i], titles[i], dates_posted[i], locations[i], beds[i], descriptions[i],
+                    currency, price)
+        print(prices[i])
         flats_list.append(flat)
     return flats_list
 
@@ -52,24 +70,10 @@ def insert_into_db(flats_list: list):
     Inserts into DB
     """
     for flat in flats_list:
-        sqlFormula = f'INSERT INTO houses_db.houses_table(image, title, date, location, beds, description, price) VALUES ("' \
-                     f'{flat.image}", "{flat.title}", "{flat.date_posted}", "{flat.location}", "{flat.beds}",' \
-                     f' "{flat.description}", "{flat.price}")'
-        mycursor.execute(sqlFormula)
-        mydb.commit()
-
-
-def clean(string: str):
-    """
-    Cleans useless chars in string
-    """
-    counter = 0
-    for c in string:
-        if c != ' ':
-            break
-        else:
-            counter += 1
-    return counter
+        flat_query = ads_table.insert().values(image=flat.image, title=flat.title, date_posted=flat.date_posted,
+                                               location=flat.location, beds=flat.beds, description=flat.description,
+                                               currency=flat.currency, price=flat.price)
+        conn.execute(flat_query)
 
 
 url = 'https://www.kijiji.ca/b-apartments-condos/city-of-toronto/c37l1700273'
@@ -99,23 +103,18 @@ while count <= 95:  # type any integer you want to parse curtain amount of pages
     count += 1
 
 n = int(len(houses)) - 1
-
 count_houses = 0
-while count_houses <= 3776:  # type any integer you want to parse curtain amount of ads
+# Ads iterator
+while count_houses <= 3770:  # type any integer you want to parse curtain amount of ads
     info = houses[int(count_houses)]
 
     # IMAGE
     images_list = []
     for c in info.find_all('div', class_='image'):
         for i in c.find_all('img'):
-            try:
-                print(i['data-src'])
-                images_list.append(i['data-src'])
-            except KeyError:
-                print('Image not found.')
-                images_list.append('null')
+            images_list.append(str(i.get('data-src')))
 
-    # PRICE
+    # PRICE & CURRENCY
     prices_list = []
     for price in info.find_all('div', class_='price'):
         print(price.get_text().replace('\n', '').replace(' ', '').replace('"', '').replace("'", ''))
@@ -124,8 +123,7 @@ while count_houses <= 3776:  # type any integer you want to parse curtain amount
     # TITLE
     titles_list = []
     for title in info.find_all('a', class_='title'):
-        title = title.get_text().replace('\n', '').replace('"', '').replace("'", '')
-        title = title[clean(title):][::-1][clean(title[clean(title):][::-1]):][::-1]
+        title = title.get_text().replace('\n', '').replace('"', '').replace("'", '').strip()
         print(title)
         titles_list.append(title)
 
@@ -138,24 +136,22 @@ while count_houses <= 3776:  # type any integer you want to parse curtain amount
     # DESCRIPTION
     descriptions_list = []
     for description in info.find_all('div', class_='description'):
-        description = description.get_text().replace('\n', '').replace('"', '').replace("'", '')
-        description = description[clean(description):][::-1][clean(description[clean(description):][::-1]):][::-1]
+        description = description.get_text().replace('\n', '').replace('"', '').replace("'", '').strip()
         print(description)
         descriptions_list.append(description)
 
     # LOCATION
     locations_list = []
     for location in info.find_all('span', class_=''):
-        location = location.get_text().replace('\n', '').replace('"', '').replace("'", '')
-        location = location[clean(location):][::-1][clean(location[clean(location):][::-1]):][::-1]
+        location = location.get_text().replace('\n', '').replace('"', '').replace("'", '').strip()
         print(location)
         locations_list.append(location)
 
     # POSTDATE
     dates_posted_list = []
     for date_posted in info.find_all('span', class_='date-posted'):
-        date_posted = date_posted.get_text().replace('\n', '').replace('/', '-').replace('"', '').replace("'", '')
-        date_posted = date_posted[clean(date_posted):][::-1][clean(date_posted[clean(date_posted):][::-1]):][::-1]
+        date_posted = date_posted.get_text().replace('\n', '').replace('/', '-').replace('"', '').replace("'",
+                                                                                                          '').strip()
         print(date_posted)
         dates_posted_list.append(date_posted)
 
