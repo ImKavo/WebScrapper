@@ -77,7 +77,7 @@ houses = []
 count = 1
 
 # Page iterator
-while count <= 95:
+while count <= 95:  # type any integer you want to parse curtain amount of pages
     # Script that puts page number in link
     url = 'https://www.kijiji.ca/b-apartments-condos/city-of-toronto/page-' + str(count) + '/c37l1700273'
     print(url)
@@ -101,7 +101,7 @@ while count <= 95:
 n = int(len(houses)) - 1
 
 count_houses = 0
-while count_houses <= 3776:
+while count_houses <= 3776:  # type any integer you want to parse curtain amount of ads
     info = houses[int(count_houses)]
 
     # IMAGE
