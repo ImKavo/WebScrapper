@@ -5,7 +5,7 @@ WebScrapper a pretty easy to set up on your device.
 
 
 # HOW TO SET UP
-WebScrapper a pretty easy to set up on your device.
+WebScrapper a pretty easy to set up on your device. Just follow the instructions below:
 
 # MYSQL
         1. Install a MySQL Workbench.
