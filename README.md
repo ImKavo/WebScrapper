@@ -1,8 +1,17 @@
 # WebScrapper
 This program can parse an HTML-code from real estate site and save it to database
 
-WebScrapper a pretty easy to set up on your device.
+Technologies:
+        - Python
+        - MySQL
+        - requests, BeautifulSoup4
+        - SQLAlchemy
 
+How it works?
+        Firstly, Python connects to site through URL via requests library
+        BeautifulSoup4 gets connect and parses (scraps) site
+        Some functions transforms scrapped info to required format
+        MySQL database saves the results of parsing into table through SQLAlchemy ORM
 
 # HOW TO SET UP
 WebScrapper a pretty easy to set up on your device. Just follow the instructions below:
