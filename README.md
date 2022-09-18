@@ -8,7 +8,7 @@ WebScrapper a pretty easy to set up on your device.
 WebScrapper a pretty easy to set up on your device.
 
 # PYTHON
-    1. Clone this repository on your device.
+    1. Clone this repository into your device.
     2. Open project terminal and type: python -m pip install -r requirements.txt
     3. Create a db_config.py file in project folder and type some important variables in:
         host = '127.0.0.1' # or another IP if you using host
@@ -19,6 +19,5 @@ WebScrapper a pretty easy to set up on your device.
 # MYSQL
     1. Install a MySQL Workbench.
         - Open one MySQL connection
-        - Create a database as written in houses_db_houses_table.sql
-        - Create a table as written in houses_db_houses_table.sql
+        
         
