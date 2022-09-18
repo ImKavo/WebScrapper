@@ -7,6 +7,11 @@ WebScrapper a pretty easy to set up on your device.
 # HOW TO SET UP
 WebScrapper a pretty easy to set up on your device.
 
+# MYSQL
+        1. Install a MySQL Workbench.
+        2. Open one MySQL connection
+        
+
 # PYTHON
     1. Clone this repository into your device.
     2. Open project terminal and type: python -m pip install -r requirements.txt
@@ -16,8 +21,9 @@ WebScrapper a pretty easy to set up on your device.
         password = 'password' # you can type any password you want, but you should remember it
         db_name = 'houses_db'
 
-# MYSQL
-    1. Install a MySQL Workbench.
-        - Open one MySQL connection
+Perfect! Now you can run scrapper.py, wait some time and look out the results in MySQL Workbench
+        
+
+        
         
         
