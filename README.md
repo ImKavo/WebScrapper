@@ -8,7 +8,7 @@ This program can parse an HTML-code from real estate site and save it to databas
         - SQLAlchemy
 
 # How it works?
-        1. Firstly, Python connects to site through URL via requests library
+        1. Python connects to site through URL via requests library
         2. BeautifulSoup4 gets connect and parses (scraps) site
         3. Some functions transforms scrapped info to required format
         4. MySQL database saves the results of parsing into table through SQLAlchemy ORM
